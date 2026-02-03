@@ -1,5 +1,6 @@
 import { Header } from "@/components/header";
 import { Card, CardTitle} from "@/components/ui";
+import { TasksSection } from "@/components/tasks";
 
 export default function HomePage() {
   return (
@@ -19,25 +20,16 @@ export default function HomePage() {
 function TimeSettingsSection() {
   return (
     <Card>
-      <CardTitle>Tidsinnstillinger</CardTitle>
+      <CardTitle>⏰ Tidsinnstillinger</CardTitle>
       <p className="text-gray-500 mt-2">Kommer snart...</p>
     </Card>
   );
 }
-
-function TasksSection() {
-  return (
-    <Card>
-      <CardTitle>Oppgaver</CardTitle>
-      <p className="text-gray-500 mt-2">Kommer snart...</p>
-    </Card>
-  )
-}
-
+ 
 function FixedTasksSection() {
   return (
     <Card>
-      <CardTitle>Faste tider</CardTitle>
+      <CardTitle>📌 Faste tider</CardTitle>
       <p className="text-gray-500 mt-2">Kommer snart...</p>
     </Card>
   );
