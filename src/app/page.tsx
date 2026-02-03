@@ -1,13 +1,14 @@
 import { Header } from "@/components/header";
-import { Card, CardTitle} from "@/components/ui";
+import { TimeSettingsSection } from "@/components/time-settings-section";
 import { TasksSection } from "@/components/tasks";
 import { FixedTasksSection } from "@/components/fixed-tasks";
+import { PlanSection } from "@/components/plan";
 
 export default function HomePage() {
   return (
     <>
       <Header />
-
+      
       <div className="space-y-6">
         <TimeSettingsSection />
         <TasksSection />
@@ -15,23 +16,5 @@ export default function HomePage() {
         <PlanSection />
       </div>
     </>
-  )
-}
-
-function TimeSettingsSection() {
-  return (
-    <Card>
-      <CardTitle>⏰ Tidsinnstillinger</CardTitle>
-      <p className="text-gray-500 mt-2">Kommer snart...</p>
-    </Card>
-  );
-}
-
-function PlanSection() {
-  return (
-    <Card>
-      <CardTitle>📋 Plan</CardTitle>
-      <p className="text-gray-500 mt-2">Trykk &quot;Beregn&quot; for å generere en plan</p>
-    </Card>
   );
 }
