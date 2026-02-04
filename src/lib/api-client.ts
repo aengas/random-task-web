@@ -1,13 +1,5 @@
 import { RandomTask, FixedDateTimeTask } from "@/types";
 
-interface TaskFromApi {
-  id: string;
-  description: string;
-  required: boolean;
-  deactivated: boolean;
-  comment: string | null;
-}
-
 interface FixedTaskFromApi {
   id: string;
   taskName: string;
