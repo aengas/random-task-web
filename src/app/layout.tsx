@@ -8,6 +8,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "RandomTask",
   description: "Planlegg dagen din med tilfeldige oppgaver",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "RandomTask",
+  },
 };
 
 export default function RootLayout({

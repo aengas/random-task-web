@@ -6,6 +6,8 @@ import { useSettingsStore, useTaskStore, useFixedTaskStore, usePlanStore } from 
 import { generatePlan } from "@/services";
 import { parseTimeString } from "@/lib/time-utils";
 import { Calculator, Check } from "lucide-react";
+import { NotificationSettings } from "./notification-settings";
+import { useNotifications } from "@/hooks/use-notifications";
 
 export function TimeSettingsSection() {
   const [isCalculating, setIsCalculating] = useState(false);
@@ -14,6 +16,8 @@ export function TimeSettingsSection() {
   const tasks = useTaskStore((state) => state.tasks);
   const fixedTasks = useFixedTaskStore((state) => state.fixedTasks);
   const setPlanItems = usePlanStore((state) => state.setPlanItems);
+  const { permission, scheduleNotification } = useNotifications();
+  const scheduleNotifications = usePlanStore((state) => state.scheduleNotifications);
 
   async function handleCalculate() {
     setIsCalculating(true);
@@ -32,6 +36,11 @@ export function TimeSettingsSection() {
     });
     setPlanItems(planItems);
 
+    // Planlegg varsler hvis tillatelse er gitt
+    if (permission === "granted") {
+      scheduleNotifications(scheduleNotification);
+    }
+
     setIsCalculating(false);
     setShowSuccess(true);
 
@@ -49,7 +58,10 @@ export function TimeSettingsSection() {
 
   return (
     <Card>
-      <CardTitle>⏰ Tidsinnstillinger</CardTitle>
+      <div className="flex items-center justify-between">
+        <CardTitle>⏰ Tidsinnstillinger</CardTitle>
+        <NotificationSettings />
+      </div>
       <div className="mt-4 space-y-4">
         <TimeSettings
           startTime={settings.startTime}
