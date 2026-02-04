@@ -22,6 +22,7 @@ export const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
             "rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2",
             "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
             "focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500",
+            "[&::-webkit-calendar-picker-indicator]:dark:invert",
             className
           )}
           {...props}

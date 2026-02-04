@@ -37,7 +37,7 @@ export function FixedTaskListItem({ task }: FixedTaskListItemProps) {
         </p>
       </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
         <Checkbox
           id={`fixed-deactivated-${task.id}`}
           label="Deaktiver"

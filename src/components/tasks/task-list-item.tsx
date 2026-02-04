@@ -37,7 +37,7 @@ export function TaskListItem({ task, index }: TaskListItemProps) {
             )}
         </div>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
             <Checkbox
             id={`required-${task.id}`}
             label="Påkrevd"
