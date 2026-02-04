@@ -47,6 +47,7 @@ model User {
   sessions      Session[]
   tasks         Task[]
   fixedTasks    FixedTask[]
+  plan          Plan?
 }
 
 model VerificationToken {
@@ -79,4 +80,22 @@ model FixedTask {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Plan {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     PlanItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model PlanItem {
+  id       String   @id @default(cuid())
+  time     DateTime
+  taskName String
+  planId   String
+  plan     Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  order    Int
 }

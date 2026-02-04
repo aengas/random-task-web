@@ -99,3 +99,39 @@ export async function deleteFixedTask(id: string): Promise<void> {
   });
   if (!response.ok) throw new Error("Failed to delete fixed task");
 }
+
+interface PlanItemFromApi {
+  time: string;
+  taskName: string;
+}
+
+export async function fetchPlan(): Promise<{ time: Date; taskName: string }[]> {
+  const response = await fetch("/api/plan");
+  if (!response.ok) throw new Error("Failed to fetch plan");
+  const data: { items: PlanItemFromApi[] } = await response.json();
+  return data.items.map((item) => ({
+    time: new Date(item.time),
+    taskName: item.taskName,
+  }));
+}
+
+export async function savePlan(items: { time: Date; taskName: string }[]): Promise<void> {
+  const response = await fetch("/api/plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: items.map((item) => ({
+        time: item.time.toISOString(),
+        taskName: item.taskName,
+      })),
+    }),
+  });
+  if (!response.ok) throw new Error("Failed to save plan");
+}
+
+export async function deletePlan(): Promise<void> {
+  const response = await fetch("/api/plan", {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete plan");
+}
