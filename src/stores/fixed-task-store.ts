@@ -10,6 +10,7 @@ interface FixedTaskStore {
   addFixedTask: (input: CreateFixedTaskInput) => Promise<void>;
   removeFixedTask: (id: string) => Promise<void>;
   toggleDeactivated: (id: string) => Promise<void>;
+  updateTaskName: (id: string, taskName: string) => Promise<void>;
   getActiveFixedTasks: () => FixedDateTimeTask[];
   getFixedTasksInRange: (start: Date, end: Date) => FixedDateTimeTask[];
 }
@@ -24,7 +25,7 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
     try {
       const fixedTasks = await api.fetchFixedTasks();
       set({ fixedTasks, isLoading: false });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke hente faste tider", isLoading: false });
     }
   },
@@ -38,7 +39,7 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
         );
         return { fixedTasks: sortedTasks };
       });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke legge til fast tid" });
     }
   },
@@ -50,7 +51,7 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
     }));
     try {
       await api.deleteFixedTask(id);
-    } catch (error) {
+    } catch {
       set({ fixedTasks: previousTasks, error: "Kunne ikke slette fast tid" });
     }
   },
@@ -66,9 +67,23 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
     }));
     try {
       await api.updateFixedTask(id, { deactivated: !task.deactivated });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke oppdatere fast tid" });
       get().fetchFixedTasks();
+    }
+  },
+
+  updateTaskName: async (id, taskName) => {
+    const previousTasks = get().fixedTasks;
+    set((state) => ({
+      fixedTasks: state.fixedTasks.map((t) =>
+        t.id === id ? { ...t, taskName } : t
+      ),
+    }));
+    try {
+      await api.updateFixedTask(id, { taskName });
+    } catch {
+      set({ fixedTasks: previousTasks, error: "Kunne ikke oppdatere navn" });
     }
   },
 

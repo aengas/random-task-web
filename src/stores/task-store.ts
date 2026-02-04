@@ -12,6 +12,7 @@ interface TaskStore {
   toggleRequired: (id: string) => Promise<void>;
   toggleDeactivated: (id: string) => Promise<void>;
   updateComment: (id: string, comment: string) => Promise<void>;
+  updateDescription: (id: string, description: string) => Promise<void>;
   getActiveTasks: () => RandomTask[];
   getRequiredTasks: () => RandomTask[];
   getNonRequiredTasks: () => RandomTask[];
@@ -27,7 +28,7 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     try {
       const tasks = await api.fetchTasks();
       set({ tasks, isLoading: false });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke hente oppgaver", isLoading: false });
     }
   },
@@ -36,7 +37,7 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     try {
       const newTask = await api.createTask(input);
       set((state) => ({ tasks: [...state.tasks, newTask] }));
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke legge til oppgave" });
     }
   },
@@ -48,7 +49,7 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     }));
     try {
       await api.deleteTask(id);
-    } catch (error) {
+    } catch {
       set({ tasks: previousTasks, error: "Kunne ikke slette oppgave" });
     }
   },
@@ -64,7 +65,7 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     }));
     try {
       await api.updateTask(id, { required: !task.required });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke oppdatere oppgave" });
       get().fetchTasks();
     }
@@ -81,7 +82,7 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     }));
     try {
       await api.updateTask(id, { deactivated: !task.deactivated });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke oppdatere oppgave" });
       get().fetchTasks();
     }
@@ -95,8 +96,22 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
     }));
     try {
       await api.updateTask(id, { comment });
-    } catch (error) {
+    } catch {
       set({ error: "Kunne ikke oppdatere kommentar" });
+    }
+  },
+
+  updateDescription: async (id, description) => {
+    const previousTasks = get().tasks;
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, description } : t
+      ),
+    }));
+    try {
+      await api.updateTask(id, { description });
+    } catch {
+      set({ tasks: previousTasks, error: "Kunne ikke oppdatere beskrivelse" });
     }
   },
 
