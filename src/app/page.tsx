@@ -1,5 +1,6 @@
 import { Header } from "@/components/header";
 import { DataLoader } from "@/components/data-loader";
+import { SunTimes } from "@/components/sun-times";
 import { TimeSettingsSection } from "@/components/time-settings-section";
 import { TasksSection } from "@/components/tasks";
 import { FixedTasksSection } from "@/components/fixed-tasks";
@@ -11,6 +12,7 @@ export default function HomePage() {
       <Header />
       
       <div className="space-y-6">
+        <SunTimes />
         <TimeSettingsSection />
         <TasksSection />
         <FixedTasksSection />
