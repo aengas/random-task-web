@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -35,16 +36,20 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Bruker ikke funnet" }, { status: 404 });
     }
 
-    if (user.password !== currentPassword) {
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isValidPassword) {
       return NextResponse.json(
         { error: "Nåværende passord er feil" },
         { status: 400 }
       );
     }
 
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { password: newPassword },
+      data: { password: hashedNewPassword },
     });
 
     return NextResponse.json({ success: true });
