@@ -13,6 +13,7 @@ interface SettingsStore {
   setAllTasks: (value: boolean) => void;
   setShouldBeRandom: (value: boolean) => void;
   setNumberOfNonRequiredTasks: (count: number) => void;
+  resetTimes: () => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -30,9 +31,26 @@ export const useSettingsStore = create<SettingsStore>()(
       setShouldBeRandom: (value) => set({ shouldBeRandom: value }),
       setNumberOfNonRequiredTasks: (count) =>
         set({ numberOfNonRequiredTasks: count }),
+      resetTimes: () =>
+        set({
+          startTime: getTimeString(getDefaultStartTime()),
+          endTime: getTimeString(getDefaultEndTime()),
+        }),
     }),
     {
       name: "settings-storage",
+      partialize: (state) => ({
+        allTasks: state.allTasks,
+        shouldBeRandom: state.shouldBeRandom,
+        numberOfNonRequiredTasks: state.numberOfNonRequiredTasks,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Etter rehydrering, sett alltid ferske start/sluttider
+        if (state) {
+          state.startTime = getTimeString(getDefaultStartTime());
+          state.endTime = getTimeString(getDefaultEndTime());
+        }
+      },
     }
   )
 );

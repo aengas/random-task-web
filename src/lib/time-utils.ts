@@ -28,9 +28,16 @@ export function roundToNearestFiveMinutes(date: Date): Date {
 
 export function getDefaultStartTime(): Date {
   const now = new Date();
-  const rounded = roundToNearestFiveMinutes(now);
-  rounded.setMinutes(rounded.getMinutes() + 5);
-  return rounded;
+  const minutes = now.getMinutes();
+  const remainder = minutes % 5;
+  
+  if (remainder !== 0) {
+    now.setMinutes(minutes + (5 - remainder));
+  }
+  now.setSeconds(0);
+  now.setMilliseconds(0);
+  
+  return now;
 }
 
 export function getDefaultEndTime(): Date {
