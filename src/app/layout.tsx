@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -11,15 +12,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="nb">
       <body className={`${inter.className} bg-gray-50 min-h-screen`}>
-        <main className="container mx-auto px-4 py-6 max-w-4xl">
-          {children}
-        </main>
+        <Providers>
+          <main className="container mx-auto px-4 py-6 max-w-4xl">
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );
