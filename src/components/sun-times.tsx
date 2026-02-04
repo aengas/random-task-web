@@ -30,8 +30,12 @@ export function SunTimes() {
         const position = await getCurrentPosition();
         const { latitude, longitude } = position.coords;
 
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dateString = yesterday.toISOString().split("T")[0];
+
         const response = await fetch(
-          `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`
+          `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&date=${dateString}&formatted=0`
         );
 
         if (!response.ok) {
