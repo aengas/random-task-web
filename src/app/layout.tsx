@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: "RandomTask",
   description: "Planlegg dagen din med tilfeldige oppgaver",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
