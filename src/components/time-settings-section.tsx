@@ -146,20 +146,27 @@ function TaskSettings({
   onNumberOfNonRequiredChange,
 }: TaskSettingsProps) {
   return (
-    <div className="flex flex-wrap gap-4 items-end">
-      <Checkbox
-        id="all-tasks"
-        label="Alle oppgaver"
-        checked={allTasks}
-        onChange={(e) => onAllTasksChange(e.target.checked)}
-      />
-      <Checkbox
-        id="should-be-random"
-        label="Tilfeldig antall"
-        checked={shouldBeRandom}
-        onChange={(e) => onShouldBeRandomChange(e.target.checked)}
-      />
-      <div className="w-32">
+    <div className="flex flex-wrap gap-6 items-end">
+      <div className="flex flex-col gap-1">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Oppgavevalg
+        </span>
+        <div className="flex gap-4 h-10 items-center">
+          <Checkbox
+            id="all-tasks"
+            label="Alle oppgaver"
+            checked={allTasks}
+            onChange={(e) => onAllTasksChange(e.target.checked)}
+          />
+          <Checkbox
+            id="should-be-random"
+            label="Tilfeldig antall"
+            checked={shouldBeRandom}
+            onChange={(e) => onShouldBeRandomChange(e.target.checked)}
+          />
+        </div>
+      </div>
+      <div className="w-36">
         <Input
           id="non-required-count"
           label="Antall ikke-påkrevde"
