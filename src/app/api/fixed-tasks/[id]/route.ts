@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
@@ -13,6 +13,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = await params;
   const body = await request.json();
   const updateData: Record<string, unknown> = {};
   
@@ -22,7 +23,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   if (body.stopTime !== undefined) updateData.stopTime = new Date(body.stopTime);
 
   const task = await prisma.fixedTask.updateMany({
-    where: { id: params.id, userId: session.user.id },
+    where: { id, userId: session.user.id },
     data: updateData,
   });
 
@@ -39,8 +40,9 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = await params;
   await prisma.fixedTask.deleteMany({
-    where: { id: params.id, userId: session.user.id },
+    where: { id, userId: session.user.id },
   });
 
   return NextResponse.json({ success: true });
