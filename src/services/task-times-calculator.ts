@@ -27,31 +27,38 @@ export function calculateTimesForEachTask(input: CalculateInput): PlanItem[] {
   let currentTime = new Date(startTime);
   let fixedTaskIndex = 0;
   let randomTaskIndex = 0;
+  let remainingTimeForCurrentTask = timePerTask;
 
-  for (let i = 0; i < tasksInRandomOrder.length + activeFixedTasks.length; i++) {
-    if (shouldAddRandomTask(fixedTaskIndex, activeFixedTasks, currentTime)) {
+  while (randomTaskIndex < tasksInRandomOrder.length || fixedTaskIndex < activeFixedTasks.length) {
+    const nextFixedTask = fixedTaskIndex < activeFixedTasks.length ? activeFixedTasks[fixedTaskIndex] : null;
+    
+    if (nextFixedTask && currentTime.getTime() >= nextFixedTask.startTime.getTime()) {
       planItems.push({
-        time: new Date(currentTime),
+        time: new Date(nextFixedTask.startTime),
+        taskName: nextFixedTask.taskName,
+      });
+      currentTime = new Date(nextFixedTask.stopTime);
+      fixedTaskIndex++;
+    } else if (randomTaskIndex < tasksInRandomOrder.length) {
+      const taskStartTime = new Date(currentTime);
+      planItems.push({
+        time: taskStartTime,
         taskName: tasksInRandomOrder[randomTaskIndex],
       });
-      currentTime = new Date(currentTime.getTime() + timePerTask);
-      randomTaskIndex++;
-    } else {
-      const fixedTask = activeFixedTasks[fixedTaskIndex];
-      planItems.push({
-        time: new Date(fixedTask.startTime),
-        taskName: fixedTask.taskName,
-      });
-
-      if (shouldContinuePreviousTask(randomTaskIndex, fixedTask, activeFixedTasks, fixedTaskIndex)) {
-        planItems.push({
-          time: new Date(fixedTask.stopTime),
-          taskName: tasksInRandomOrder[randomTaskIndex - 1],
-        });
+      
+      const taskEndTime = new Date(currentTime.getTime() + remainingTimeForCurrentTask);
+      
+      if (nextFixedTask && taskEndTime.getTime() > nextFixedTask.startTime.getTime()) {
+        currentTime = new Date(nextFixedTask.startTime);
+        const usedTime = nextFixedTask.startTime.getTime() - taskStartTime.getTime();
+        remainingTimeForCurrentTask = remainingTimeForCurrentTask - usedTime;
+      } else {
+        currentTime = taskEndTime;
+        randomTaskIndex++;
+        remainingTimeForCurrentTask = timePerTask;
       }
-
-      currentTime = new Date(fixedTask.stopTime);
-      fixedTaskIndex++;
+    } else {
+      break;
     }
   }
 
@@ -82,28 +89,4 @@ function calculateTimePerNonFixedTask(
   );
   const availableTime = totalTime - fixedTasksTime;
   return Math.floor(availableTime / taskCount);
-}
-
-function shouldAddRandomTask(
-  fixedTaskIndex: number,
-  fixedTasks: FixedDateTimeTask[],
-  currentTime: Date
-): boolean {
-  if (fixedTaskIndex >= fixedTasks.length) return true;
-  return currentTime < fixedTasks[fixedTaskIndex].startTime;
-}
-
-function shouldContinuePreviousTask(
-  randomTaskIndex: number,
-  currentFixedTask: FixedDateTimeTask,
-  fixedTasks: FixedDateTimeTask[],
-  fixedTaskIndex: number
-): boolean {
-  if (randomTaskIndex === 0) return false;
-  
-  const hasNextFixedTask = fixedTaskIndex + 1 < fixedTasks.length;
-  if (!hasNextFixedTask) return true;
-  
-  const nextFixedTask = fixedTasks[fixedTaskIndex + 1];
-  return nextFixedTask.startTime.getTime() !== currentFixedTask.stopTime.getTime();
 }
