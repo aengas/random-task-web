@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardTitle, Input, Button } from "@/components/ui";
-import { LogIn, Clock, UserPlus } from "lucide-react";
+import { LogIn, Clock } from "lucide-react";
 import Link from "next/link";
 
 export default function SignInPage() {
