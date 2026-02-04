@@ -10,7 +10,7 @@ export function PlanSection() {
   return (
     <Card>
       <CardTitle>📋 Plan</CardTitle>
-      <div className="mt-4">
+      <div className="mt-4" id="generated-plan">
         {planItems.length === 0 ? (
           <EmptyPlanMessage />
         ) : (

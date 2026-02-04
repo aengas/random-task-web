@@ -1,18 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardTitle, TimeInput, Checkbox, Input, Button } from "@/components/ui";
 import { useSettingsStore, useTaskStore, useFixedTaskStore, usePlanStore } from "@/stores";
 import { generatePlan } from "@/services";
 import { parseTimeString } from "@/lib/time-utils";
-import { Calculator } from "lucide-react";
+import { Calculator, Check } from "lucide-react";
 
 export function TimeSettingsSection() {
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const settings = useSettingsStore();
   const tasks = useTaskStore((state) => state.tasks);
   const fixedTasks = useFixedTaskStore((state) => state.fixedTasks);
   const setPlanItems = usePlanStore((state) => state.setPlanItems);
 
-  function handleCalculate() {
+  async function handleCalculate() {
+    setIsCalculating(true);
+    setShowSuccess(false);
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     const planItems = generatePlan({
       tasks,
       fixedTasks,
@@ -23,6 +31,20 @@ export function TimeSettingsSection() {
       numberOfNonRequiredTasks: settings.numberOfNonRequiredTasks,
     });
     setPlanItems(planItems);
+
+    setIsCalculating(false);
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      const planElement = document.getElementById("generated-plan");
+      if (planElement) {
+        planElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 2000);
   }
 
   return (
@@ -43,9 +65,32 @@ export function TimeSettingsSection() {
           onShouldBeRandomChange={settings.setShouldBeRandom}
           onNumberOfNonRequiredChange={settings.setNumberOfNonRequiredTasks}
         />
-        <Button onClick={handleCalculate} size="lg" className="w-full sm:w-auto">
-          <Calculator className="w-4 h-4 mr-2" />
-          Beregn plan
+        <Button
+          onClick={handleCalculate}
+          size="lg"
+          className={`w-full sm:w-auto transition-all duration-200 active:scale-95 ${
+            showSuccess
+              ? "bg-green-600 hover:bg-green-700"
+              : ""
+          }`}
+          disabled={isCalculating}
+        >
+          {isCalculating ? (
+            <>
+              <span className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Beregner...
+            </>
+          ) : showSuccess ? (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Plan beregnet!
+            </>
+          ) : (
+            <>
+              <Calculator className="w-4 h-4 mr-2" />
+              Beregn plan
+            </>
+          )}
         </Button>
       </div>
     </Card>
