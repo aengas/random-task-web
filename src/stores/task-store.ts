@@ -1,65 +1,106 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { RandomTask, createRandomTask, CreateRandomTaskInput } from "@/types";
+import { RandomTask, CreateRandomTaskInput } from "@/types";
+import * as api from "@/lib/api-client";
 
 interface TaskStore {
   tasks: RandomTask[];
-  addTask: (input: CreateRandomTaskInput) => void;
-  removeTask: (id: string) => void;
-  toggleRequired: (id: string) => void;
-  toggleDeactivated: (id: string) => void;
-  updateComment: (id: string, comment: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchTasks: () => Promise<void>;
+  addTask: (input: CreateRandomTaskInput) => Promise<void>;
+  removeTask: (id: string) => Promise<void>;
+  toggleRequired: (id: string) => Promise<void>;
+  toggleDeactivated: (id: string) => Promise<void>;
+  updateComment: (id: string, comment: string) => Promise<void>;
   getActiveTasks: () => RandomTask[];
   getRequiredTasks: () => RandomTask[];
   getNonRequiredTasks: () => RandomTask[];
 }
 
-export const useTaskStore = create<TaskStore>()(
-  persist(
-    (set, get) => ({
-      tasks: [],
+export const useTaskStore = create<TaskStore>()((set, get) => ({
+  tasks: [],
+  isLoading: false,
+  error: null,
 
-      addTask: (input) =>
-        set((state) => ({
-          tasks: [...state.tasks, createRandomTask(input)],
-        })),
-
-      removeTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== id),
-        })),
-
-      toggleRequired: (id) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === id ? { ...task, required: !task.required } : task
-          ),
-        })),
-
-      toggleDeactivated: (id) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === id ? { ...task, deactivated: !task.deactivated } : task
-          ),
-        })),
-
-      updateComment: (id, comment) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === id ? { ...task, comment } : task
-          ),
-        })),
-
-      getActiveTasks: () => get().tasks.filter((task) => !task.deactivated),
-
-      getRequiredTasks: () =>
-        get().tasks.filter((task) => task.required && !task.deactivated),
-
-      getNonRequiredTasks: () =>
-        get().tasks.filter((task) => !task.required && !task.deactivated),
-    }),
-    {
-      name: "random-task-storage",
+  fetchTasks: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const tasks = await api.fetchTasks();
+      set({ tasks, isLoading: false });
+    } catch (error) {
+      set({ error: "Kunne ikke hente oppgaver", isLoading: false });
     }
-  )
-);
+  },
+
+  addTask: async (input) => {
+    try {
+      const newTask = await api.createTask(input);
+      set((state) => ({ tasks: [...state.tasks, newTask] }));
+    } catch (error) {
+      set({ error: "Kunne ikke legge til oppgave" });
+    }
+  },
+
+  removeTask: async (id) => {
+    const previousTasks = get().tasks;
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task.id !== id),
+    }));
+    try {
+      await api.deleteTask(id);
+    } catch (error) {
+      set({ tasks: previousTasks, error: "Kunne ikke slette oppgave" });
+    }
+  },
+
+  toggleRequired: async (id) => {
+    const task = get().tasks.find((t) => t.id === id);
+    if (!task) return;
+    
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, required: !t.required } : t
+      ),
+    }));
+    try {
+      await api.updateTask(id, { required: !task.required });
+    } catch (error) {
+      set({ error: "Kunne ikke oppdatere oppgave" });
+      get().fetchTasks();
+    }
+  },
+
+  toggleDeactivated: async (id) => {
+    const task = get().tasks.find((t) => t.id === id);
+    if (!task) return;
+    
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, deactivated: !t.deactivated } : t
+      ),
+    }));
+    try {
+      await api.updateTask(id, { deactivated: !task.deactivated });
+    } catch (error) {
+      set({ error: "Kunne ikke oppdatere oppgave" });
+      get().fetchTasks();
+    }
+  },
+
+  updateComment: async (id, comment) => {
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, comment } : t
+      ),
+    }));
+    try {
+      await api.updateTask(id, { comment });
+    } catch (error) {
+      set({ error: "Kunne ikke oppdatere kommentar" });
+    }
+  },
+
+  getActiveTasks: () => get().tasks.filter((task) => !task.deactivated),
+  getRequiredTasks: () => get().tasks.filter((t) => t.required && !t.deactivated),
+  getNonRequiredTasks: () => get().tasks.filter((t) => !t.required && !t.deactivated),
+}));
