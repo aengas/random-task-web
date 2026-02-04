@@ -8,7 +8,7 @@ export function TaskList() {
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <p>Ingen oppgaver lagt til ennå.</p>
         <p className="text-sm mt-1">Legg til din første oppgave ovenfor.</p>
       </div>

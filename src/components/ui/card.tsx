@@ -11,7 +11,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           <div 
             ref={ref}
             className={cn(
-                "bg-white rounded-xl shadow-sm border border-gray-200",
+                "bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700",
                 getPaddingClasses(padding),
                 className
             )}
@@ -34,7 +34,7 @@ function getPaddingClasses(padding: CardProps["padding"]) {
 export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-b border-gray-200 pb-4 mb-4", className)}
+      className={cn("border-b border-gray-200 dark:border-gray-700 pb-4 mb-4", className)}
       {...props}
     />
   );
@@ -43,7 +43,7 @@ export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElemen
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>){
     return (
         <h2
-          className={cn("text-lg font-semibold text-gray-900", className)}
+          className={cn("text-lg font-semibold text-gray-900 dark:text-gray-100", className)}
           {...props}
         />
     );

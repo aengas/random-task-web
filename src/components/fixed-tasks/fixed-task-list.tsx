@@ -8,7 +8,7 @@ export function FixedTaskList() {
 
   if (fixedTasks.length === 0) {
     return (
-      <div className="text-center py-6 text-gray-500">
+      <div className="text-center py-6 text-gray-500 dark:text-gray-400">
         <p>Ingen faste tider lagt til.</p>
         <p className="text-sm mt-1">Legg til møter, pauser eller andre faste aktiviteter.</p>
       </div>

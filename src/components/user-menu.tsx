@@ -11,7 +11,7 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
         <User className="w-4 h-4" />
         <span>{session.user.name ?? session.user.email}</span>
       </div>

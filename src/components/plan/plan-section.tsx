@@ -23,7 +23,7 @@ export function PlanSection() {
 
 function EmptyPlanMessage() {
   return (
-    <div className="text-center py-8 text-gray-500">
+    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
       <p>Ingen plan generert ennå.</p>
       <p className="text-sm mt-1">Trykk &quot;Beregn plan&quot; for å lage en plan.</p>
     </div>

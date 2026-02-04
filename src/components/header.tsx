@@ -10,8 +10,8 @@ export function Header() {
             <Clock className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">RandomTask</h1>
-            <p className="text-sm text-gray-600">Planlegg dagen din</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">RandomTask</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Planlegg dagen din</p>
           </div>
         </div>
         <UserMenu />

@@ -29,7 +29,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <Card className="w-full max-w-md">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-600 rounded-lg">
@@ -54,7 +54,7 @@ export default function SignInPage() {
           </Button>
         </form>
 
-        <p className="mt-4 text-sm text-gray-500 text-center">
+        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
           Demo-modus: Skriv inn en e-postadresse for å starte.
         </p>
       </Card>
