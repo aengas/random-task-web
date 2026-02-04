@@ -7,27 +7,29 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
   providers: [
     CredentialsProvider({
-      name: "Demo",
+      name: "Credentials",
       credentials: {
-        email: { label: "E-post", type: "email", placeholder: "demo@example.com" },
+        username: { label: "Brukernavn", type: "text" },
+        password: { label: "Passord", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
-        
-        let user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+        if (!credentials?.username || !credentials?.password) return null;
+
+        const user = await prisma.user.findUnique({
+          where: { username: credentials.username },
         });
 
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email: credentials.email,
-              name: credentials.email.split("@")[0],
-            },
-          });
-        }
+        if (!user) return null;
 
-        return user;
+        // Enkel passordsjekk (i produksjon bør du bruke bcrypt)
+        if (user.password !== credentials.password) return null;
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+        };
       },
     }),
   ],
