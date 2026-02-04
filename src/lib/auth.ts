@@ -21,7 +21,6 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) return null;
 
-        // Enkel passordsjekk (i produksjon bør du bruke bcrypt)
         if (user.password !== credentials.password) return null;
 
         return {
@@ -37,15 +36,28 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
       }
+
+      if (trigger === "update" && token.id) {
+        const updatedUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { name: true },
+        });
+        if (updatedUser) {
+          token.name = updatedUser.name;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.name = token.name as string;
       }
       return session;
     },
