@@ -9,6 +9,7 @@ interface TaskStore {
   fetchTasks: () => Promise<void>;
   addTask: (input: CreateRandomTaskInput) => Promise<void>;
   removeTask: (id: string) => Promise<void>;
+  removeAllTasks: () => Promise<void>;
   toggleRequired: (id: string) => Promise<void>;
   toggleDeactivated: (id: string) => Promise<void>;
   updateComment: (id: string, comment: string) => Promise<void>;
@@ -51,6 +52,17 @@ export const useTaskStore = create<TaskStore>()((set, get) => ({
       await api.deleteTask(id);
     } catch {
       set({ tasks: previousTasks, error: "Kunne ikke slette oppgave" });
+    }
+  },
+
+  removeAllTasks: async () => {
+    const previousTasks = get().tasks;
+    const taskIds = previousTasks.map((t) => t.id);
+    set({ tasks: [] });
+    try {
+      await Promise.all(taskIds.map((id) => api.deleteTask(id)));
+    } catch {
+      set({ tasks: previousTasks, error: "Kunne ikke slette alle oppgaver" });
     }
   },
 

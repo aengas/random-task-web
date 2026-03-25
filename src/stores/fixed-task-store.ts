@@ -9,6 +9,7 @@ interface FixedTaskStore {
   fetchFixedTasks: () => Promise<void>;
   addFixedTask: (input: CreateFixedTaskInput) => Promise<void>;
   removeFixedTask: (id: string) => Promise<void>;
+  removeAllFixedTasks: () => Promise<void>;
   toggleDeactivated: (id: string) => Promise<void>;
   updateTaskName: (id: string, taskName: string) => Promise<void>;
   getActiveFixedTasks: () => FixedDateTimeTask[];
@@ -53,6 +54,17 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
       await api.deleteFixedTask(id);
     } catch {
       set({ fixedTasks: previousTasks, error: "Kunne ikke slette fast tid" });
+    }
+  },
+
+  removeAllFixedTasks: async () => {
+    const previousTasks = get().fixedTasks;
+    const taskIds = previousTasks.map((t) => t.id);
+    set({ fixedTasks: [] });
+    try {
+      await Promise.all(taskIds.map((id) => api.deleteFixedTask(id)));
+    } catch {
+      set({ fixedTasks: previousTasks, error: "Kunne ikke slette alle faste tider" });
     }
   },
 
