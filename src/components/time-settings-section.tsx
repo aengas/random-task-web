@@ -36,7 +36,6 @@ export function TimeSettingsSection() {
     });
     setPlanItems(planItems);
 
-    // Planlegg varsler hvis tillatelse er gitt
     if (permission === "granted") {
       scheduleNotifications(scheduleNotification);
     }
@@ -56,6 +55,32 @@ export function TimeSettingsSection() {
     }, 2000);
   }
 
+  function calculateTimePerTask(): string {
+    const activeTasks = tasks.filter((t) => !t.deactivated);
+    const requiredCount = activeTasks.filter((t) => t.required).length;
+    const taskCount = requiredCount + settings.numberOfNonRequiredTasks;
+
+    if (taskCount <= 0) return "00:00";
+
+    const [startH, startM] = settings.startTime.split(":").map(Number);
+    const [endH, endM] = settings.endTime.split(":").map(Number);
+    const totalMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+
+    const activeFixedTasks = fixedTasks.filter((ft) => !ft.deactivated);
+    const fixedMinutes = activeFixedTasks.reduce((sum, ft) => {
+      const diff = (ft.stopTime.getTime() - ft.startTime.getTime()) / 60000;
+      return sum + diff;
+    }, 0);
+
+    const availableMinutes = totalMinutes - fixedMinutes;
+    if (availableMinutes <= 0) return "00:00";
+
+    const perTask = Math.floor(availableMinutes / taskCount);
+    const hours = Math.floor(perTask / 60);
+    const minutes = perTask % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  }
+
   return (
     <Card>
       <div className="flex items-center justify-between">
@@ -73,6 +98,7 @@ export function TimeSettingsSection() {
           allTasks={settings.allTasks}
           shouldBeRandom={settings.shouldBeRandom}
           numberOfNonRequiredTasks={settings.numberOfNonRequiredTasks}
+          timePerTask={calculateTimePerTask()}
           onAllTasksChange={settings.setAllTasks}
           onShouldBeRandomChange={settings.setShouldBeRandom}
           onNumberOfNonRequiredChange={settings.setNumberOfNonRequiredTasks}
@@ -144,6 +170,7 @@ interface TaskSettingsProps {
   allTasks: boolean;
   shouldBeRandom: boolean;
   numberOfNonRequiredTasks: number;
+  timePerTask: string;
   onAllTasksChange: (value: boolean) => void;
   onShouldBeRandomChange: (value: boolean) => void;
   onNumberOfNonRequiredChange: (count: number) => void;
@@ -153,6 +180,7 @@ function TaskSettings({
   allTasks,
   shouldBeRandom,
   numberOfNonRequiredTasks,
+  timePerTask,
   onAllTasksChange,
   onShouldBeRandomChange,
   onNumberOfNonRequiredChange,
@@ -189,6 +217,18 @@ function TaskSettings({
           disabled={shouldBeRandom}
         />
       </div>
+      {!shouldBeRandom && (
+        <div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Tid per task
+            </label>
+            <div className="flex items-center h-10 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+              {timePerTask}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
