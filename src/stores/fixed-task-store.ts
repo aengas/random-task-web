@@ -11,7 +11,7 @@ interface FixedTaskStore {
   removeFixedTask: (id: string) => Promise<void>;
   removeAllFixedTasks: () => Promise<void>;
   toggleDeactivated: (id: string) => Promise<void>;
-  updateTaskName: (id: string, taskName: string) => Promise<void>;
+  updateFixedTask: (id: string, updates: Partial<Pick<FixedDateTimeTask, "startTime" | "stopTime" | "taskName">>) => Promise<void>;
   getActiveFixedTasks: () => FixedDateTimeTask[];
   getFixedTasksInRange: (start: Date, end: Date) => FixedDateTimeTask[];
 }
@@ -85,17 +85,17 @@ export const useFixedTaskStore = create<FixedTaskStore>()((set, get) => ({
     }
   },
 
-  updateTaskName: async (id, taskName) => {
+  updateFixedTask: async (id, updates) => {
     const previousTasks = get().fixedTasks;
     set((state) => ({
       fixedTasks: state.fixedTasks.map((t) =>
-        t.id === id ? { ...t, taskName } : t
+        t.id === id ? { ...t, ...updates } : t
       ),
     }));
     try {
-      await api.updateFixedTask(id, { taskName });
+      await api.updateFixedTask(id, updates);
     } catch {
-      set({ fixedTasks: previousTasks, error: "Kunne ikke oppdatere navn" });
+      set({ fixedTasks: previousTasks, error: "Kunne ikke oppdatere fast tid" });
     }
   },
 

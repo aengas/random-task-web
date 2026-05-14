@@ -6,26 +6,35 @@ import { cn } from "@/lib/utils";
 import { Checkbox, Input } from "@/components/ui";
 import { FixedDateTimeTask } from "@/types";
 import { useFixedTaskStore } from "@/stores/fixed-task-store";
-import { formatTime } from "@/lib/time-utils";
+import { TimeInput } from "@/components/ui";
+import { formatTime, getTimeString, parseTimeString } from "@/lib/time-utils";
 
 interface FixedTaskListItemProps {
   task: FixedDateTimeTask;
 }
 
 export function FixedTaskListItem({ task }: FixedTaskListItemProps) {
-  const { removeFixedTask, toggleDeactivated, updateTaskName } = useFixedTaskStore();
+  const { removeFixedTask, toggleDeactivated, updateFixedTask } = useFixedTaskStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.taskName);
+  const [startTime, setStartTime] = useState(() => getTimeString(task.startTime))
+  const [stopTime, setStopTime] = useState(() => getTimeString(task.stopTime))
 
   function handleSave() {
     if (editValue.trim()) {
-      updateTaskName(task.id, editValue.trim());
+      updateFixedTask(task.id, {
+        startTime: parseTimeString(startTime),
+        stopTime: parseTimeString(stopTime),
+        taskName: editValue.trim(),
+      });
       setIsEditing(false);
     }
   }
 
   function handleCancel() {
     setEditValue(task.taskName);
+    setStartTime(getTimeString(task.startTime));
+    setStopTime(getTimeString(task.stopTime))
     setIsEditing(false);
   }
 
@@ -56,6 +65,13 @@ export function FixedTaskListItem({ task }: FixedTaskListItemProps) {
               className="flex-1"
               autoFocus
             />
+            <TimeInput 
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+            <TimeInput 
+              value={stopTime}
+              onChange={(e) => setStopTime(e.target.value)}/>
             <button
               onClick={handleSave}
               className="p-1.5 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
